@@ -26,6 +26,8 @@ runAll <- function(df,
     tmpvec[i] <- ifelse(any(is.na(mat[i,"Allele1"]), is.na(mat[i,"Allele2"])), "N",
                         ifelse(mat[i,"Allele1"] == mat[i,"Allele2"], as.character(mat[i,"Allele1"]), "H") )
   }
+  saveRDS(test, paste(output_dir, paste0("DO2_alleles_",sim,".rds"), sep="/"))
+  return(tmpvec)
 }
 
 
@@ -33,5 +35,5 @@ test <- runAll(df=genot,
                output_dir=output_dir,
                sim=sim)
 
-saveRDS(test, paste(output_dir, paste0("DO2_alleles_",sim,".rds"), sep="/"))
+
 
