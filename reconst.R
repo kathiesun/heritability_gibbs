@@ -3,8 +3,10 @@ library(happy.hbrem)
 library(tidyr)
 library(magrittr)
 
+
 ##### on killdevil
 setwd("~/pomp_do_intensities/alleles")
+#source("../../h2_src/doqtl.R")
 
 all1 <- c()
 all2 <- c()
@@ -17,9 +19,9 @@ saveRDS(all1, "all1.rds")
 saveRDS(all2, "all2.rds")
 
 ##### on desktop
-setwd("/Users/kathiesun")
+#setwd("/Users/kathiesun")
 
-genot <- read.table("pomp_do_intensities/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
+genot <- read.table("../PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
                     sep="\t", header=T)
 colnames(genot)[3:4] <- c("Allele1", "Allele2")
 genot[genot=="-"] = NA  
@@ -30,37 +32,52 @@ genot[genot=="-"] = NA
 #                      ifelse(genot[i,"Allele1"] == genot[i,"Allele2"], as.character(genot[i,"Allele1"]), "H") )
 #  print(i)
 #}
-tmpvec <- readRDS("/pomp_do_intensities/alleles/all2.rds")
+tmpvec <- readRDS("alleles2.rds")
 genot$allele <- tmpvec  
 genot$Sample.ID <- as.character(paste(genot$Sample.ID))
 genot_tmp <- genot[,c("SNP.Name","Sample.ID","allele")]
 
 genot_mat <- spread(genot_tmp, SNP.Name, allele, drop=F)  #[unique(genot_mat$SNP.Name),]
-colnames(genot_mat) <- genot_mat[1,]
-genot_mat <- genot_mat[-1,]
+#colnames(genot_mat) <- genot_mat[1,]
+#genot_mat <- genot_mat[-1,]
+rownames(genot_mat) <- genot_mat[,1]
+genot_mat <- genot_mat[,-1]
 
-genot_mat <- genot_mat[,grep("DO2", rownames(genot_mat))]
-sex <- unlist(lapply(head(strsplit(rownames(genot_mat),"-|_")), function(x) x[[4]]))
+genot_mat <- genot_mat[grep("DO2", rownames(genot_mat)),]
+sex <- unlist(lapply(strsplit(rownames(genot_mat),"-|_"), function(x) x[[4]]))
 names(sex) <- rownames(genot_mat)
-gen <- rep(length(sex), "DO10")
+gen <- rep("DO10", length(sex))
 names(gen) <- rownames(genot_mat)
 
-list(geno=genot_mat, se)
-
+data2 <- list(geno=genot_mat, sex=sex, gen=gen)
+data2 <- readRDS("data2.rds")
+DOQTL:::calc.genoprob(data2, output.dir = "../do2", 
+                      plot = FALSE, sampletype="DO", method="allele")
 
 ####
-genot_UNL <- read.table("pomp_do_intensities/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
+genot_UNL <- read.table("../UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
                         sep="\t", header=T)
 colnames(genot_UNL)[3:4] <- c("Allele1", "Allele2")
 
-tmpvec <- readRDS("/pomp_do_intensities/alleles/all1.rds")
-genot_mat$allele <- tmpvec
+tmpvec <- readRDS("alleles1.rds")
+genot_UNL$allele <- tmpvec
+genot_UNL$Sample.ID <- as.character(paste(genot_UNL$Sample.ID))
 genot_tmp <- genot_UNL[,c("SNP.Name","Sample.ID","allele")]
-genot_UNL_mat <- spread(genot_tmp, Sample.ID, allele)#[unique(genot_mat$SNP.Name),]
 
-rownames(genot_UNL_mat) <- genot_UNL_mat$SNP.Name
-genot_UNL_mat <- genot_UNL_mat[,grep("DO1", colnames(genot_UNL_mat))]
-sex_UNL <- toupper(unlist(lapply(strsplit(colnames(genot_UNL_mat),"-|_"), function(x) x[[4]])))
+genot_UNL_mat <- spread(genot_tmp, SNP.Name, allele)#[unique(genot_mat$SNP.Name),]
+rownames(genot_UNL_mat) <- genot_UNL_mat[,1]
+genot_UNL_mat <- genot_UNL_mat[,-1]
+
+genot_UNL_mat <- genot_UNL_mat[grep("DO1", rownames(genot_UNL_mat)),]
+sex_UNL <- toupper(unlist(lapply(strsplit(rownames(genot_UNL_mat),"-|_"), function(x) x[[4]])))
+
+names(sex_UNL) <- rownames(genot_UNL_mat)
+gen <- rep("DO10", length(sex_UNL))
+names(gen) <- rownames(genot_UNL_mat)
+
+data1 <- list(geno=genot_UNL_mat, sex=sex_UNL, gen=gen)
+calc.genoprob.alleles(data1, output.dir = "../do1")
+
 
 #####
 
