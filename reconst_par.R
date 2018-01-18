@@ -1,12 +1,13 @@
-setwd("~/pomp_do_intensities")
+setwd("/nas02/home/k/y/kys6/pomp_do_intensities")
 library(cmdline)
 sim <- cmdline.integer("sim")
 
-# bsub -J [1-2] R CMD BATCH --vanilla --args --sim=\$LSB_JOBINDEX reconst_par.R
+# bsub -J [1-2] -M 16 R CMD BATCH --vanilla --args --sim=\$LSB_JOBINDEX reconst_par.R
 # submit sim 1:100
 
-genot <- read.table("PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
-                    sep="\t", header=T)
+genot <- read.table("UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt",
+		     sep="\t", header=T)
+
 colnames(genot)[3:4] <- c("Allele1", "Allele2")
 genot[genot=="-"] = NA  
 
@@ -26,7 +27,7 @@ runAll <- function(df,
     tmpvec[i] <- ifelse(any(is.na(mat[i,"Allele1"]), is.na(mat[i,"Allele2"])), "N",
                         ifelse(mat[i,"Allele1"] == mat[i,"Allele2"], as.character(mat[i,"Allele1"]), "H") )
   }
-  saveRDS(test, paste(output_dir, paste0("DO2_alleles_",sim,".rds"), sep="/"))
+  saveRDS(tmpvec, paste(output_dir, paste0("DO1_alleles_",sim,".rds"), sep="/"))
   return(tmpvec)
 }
 
