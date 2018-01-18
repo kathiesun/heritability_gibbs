@@ -2,6 +2,8 @@ library(DOQTL)
 library(happy.hbrem)
 library(tidyr)
 library(magrittr)
+#install.packages("qtl2", repos="https://rqtl.org/qtl2cran")
+library(qtl2)
 
 
 ##### on killdevil
@@ -42,6 +44,7 @@ genot_mat <- spread(genot_tmp, SNP.Name, allele, drop=F)  #[unique(genot_mat$SNP
 #genot_mat <- genot_mat[-1,]
 rownames(genot_mat) <- genot_mat[,1]
 genot_mat <- genot_mat[,-1]
+genot1_intm <- genot1_intm[grep("DO2", rownames(genot1_intm)),]
 
 genot_mat <- genot_mat[grep("DO2", rownames(genot_mat)),]
 sex <- unlist(lapply(strsplit(rownames(genot_mat),"-|_"), function(x) x[[4]]))
@@ -53,6 +56,24 @@ data2 <- list(geno=genot_mat, sex=sex, gen=gen)
 data2 <- readRDS("data2.rds")
 DOQTL:::calc.genoprob(data2, output.dir = "../do2", 
                       plot = FALSE, sampletype="DO", method="allele")
+
+
+### intensity
+genot2_int <- genot[,c("SNP.Name","Sample.ID","X")]
+genot2_intm <- spread(genot2_int, SNP.Name, X, drop=F)
+rownames(genot2_intm) <- genot2_intm[,1]
+genot2_intm <- genot2_intm[,-1]
+genot2_intm <- genot2_intm[grep("DO2", rownames(genot2_intm)),]
+
+sex <- unlist(lapply(strsplit(rownames(genot2_intm),"-|_"), function(x) x[[4]]))
+names(sex) <- rownames(genot2_intm)
+gen <- rep("DO10", length(sex))
+names(gen) <- rownames(genot2_intm)
+
+data2int <- list(geno=genot2_intm, sex=sex, gen=gen)
+data2int <- readRDS("data2_int.rds")
+DOQTL:::calc.genoprob(data2_int, output.dir = "../do2_int", 
+                      plot = FALSE, sampletype="DO", method="intensity")
 
 ####
 genot_UNL <- read.table("../UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
@@ -78,8 +99,25 @@ names(gen) <- rownames(genot_UNL_mat)
 data1 <- list(geno=genot_UNL_mat, sex=sex_UNL, gen=gen)
 calc.genoprob.alleles(data1, output.dir = "../do1")
 
+### intensity
+genot1_int <- genot[,c("SNP.Name","Sample.ID","X")]
+genot1_intm <- spread(genot1_int, SNP.Name, X, drop=F)
+rownames(genot1_intm) <- genot1_intm[,1]
+genot1_intm <- genot1_intm[,-1]
+genot1_intm <- genot1_intm[grep("DO1", rownames(genot1_intm)),]
 
-#####
+sex <- unlist(lapply(strsplit(rownames(genot1_intm),"-|_"), function(x) x[[4]]))
+names(sex) <- toupper(rownames(genot1_intm))
+gen <- rep("DO10", length(sex))
+names(gen) <- rownames(genot1_intm)
+
+data1int <- list(geno=genot1_intm, sex=sex, gen=gen)
+data1int <- readRDS("data1_int.rds")
+DOQTL:::calc.genoprob(data1_int, output.dir = "../do1_int", 
+                      plot = FALSE, sampletype="DO", method="intensity")
+
+
+####################### OLDER CODE ##########################
 
 calc.genoprob(data, chr = "all", output.dir = ".", plot = TRUE, 
               array = c("gigamuga", "megamuga", "muga", "other"), 
