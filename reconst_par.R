@@ -36,4 +36,3 @@ test <- runAll(df=genot,
                sim=sim)
 
 
-
