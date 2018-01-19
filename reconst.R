@@ -1,5 +1,5 @@
-library(DOQTL)
 library(happy.hbrem)
+library(DOQTL)
 library(tidyr)
 library(magrittr)
 #install.packages("qtl2", repos="https://rqtl.org/qtl2cran")
@@ -76,7 +76,7 @@ DOQTL:::calc.genoprob(data2_int, output.dir = "../do2_int",
                       plot = FALSE, sampletype="DO", method="intensity")
 
 ####
-genot_UNL <- read.table("../UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
+genot_UNL <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
                         sep="\t", header=T)
 colnames(genot_UNL)[3:4] <- c("Allele1", "Allele2")
 
@@ -100,7 +100,7 @@ data1 <- list(geno=genot_UNL_mat, sex=sex_UNL, gen=gen)
 calc.genoprob.alleles(data1, output.dir = "../do1")
 
 ### intensity
-genot1_int <- genot[,c("SNP.Name","Sample.ID","X")]
+genot1_int <- genot_UNL[,c("SNP.Name","Sample.ID","X")]
 genot1_intm <- spread(genot1_int, SNP.Name, X, drop=F)
 rownames(genot1_intm) <- genot1_intm[,1]
 genot1_intm <- genot1_intm[,-1]
@@ -113,7 +113,7 @@ names(gen) <- rownames(genot1_intm)
 
 data1int <- list(geno=genot1_intm, sex=sex, gen=gen)
 data1int <- readRDS("data1_int.rds")
-DOQTL:::calc.genoprob(data1_int, output.dir = "../do1_int", 
+DOQTL:::calc.genoprob(data1int, output.dir = "../do1_int", 
                       plot = FALSE, sampletype="DO", method="intensity")
 
 
