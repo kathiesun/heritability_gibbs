@@ -24,7 +24,7 @@ ifiles <- c("PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport.txt",
 
 # file "stem" for output files
 # output files will be like "gm4qtl2_geno19.csv"
-ostem <- "DOqtl2"
+ostem <- "rqtl2_do12"
 remove_samps <- "269"
 
 ##############################
@@ -165,27 +165,26 @@ for(chr in c(1:19,"X","Y","M")) {
 ## Make control file 
 
 chr <- c(1:19, "X")
-write_control_file("DOqtl2.json",
+write_control_file("DO12_rqtl2.json",
                    crosstype="do",
                    description="DO12_reconst",
                    founder_geno_file=paste0("/GM/GM/GM_foundergeno", chr, ".csv"),
                    founder_geno_transposed=TRUE,
                    gmap_file=paste0("GM/GM/GM_gmap", chr, ".csv"),
                    pmap_file=paste0("GM/GM/GM_pmap", chr, ".csv"),
-                   geno_file=paste0("rqtl_data/DOqtl2_geno", chr, ".csv"),
+                   geno_file=paste0("rqtl2_do12_geno", chr, ".csv"),
                    geno_transposed=TRUE,
                    geno_codes=list(A=1, H=2, B=3),
                    xchr="X",
                    pheno_file="DO_pheno_only.csv",
                    covar_file="DO_covar.csv",
-                   sex_covar="Sex",
-                   sex_codes=list(F=as.numeric(0), M=as.numeric(1)),
+                   sex_covar="sex",
+                   sex_codes=list(F="Female", M="Male"),
                    crossinfo_covar="ngen", 
                    overwrite = T)
 
 ##########
-
-data <- read_cross2("DOqtl2.json")
-
+#source("read_cross2.R")
+data <- read_cross2("DO12_rqtl2.json", quiet=F)
 pr <- calc_genoprob(data, error_prob=0.002)
 apr <- genoprob_to_alleleprob(pr)
