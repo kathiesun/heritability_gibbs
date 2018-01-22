@@ -2,8 +2,9 @@ library(happy.hbrem)
 library(DOQTL)
 library(tidyr)
 library(magrittr)
-#install.packages("qtl2", repos="https://rqtl.org/qtl2cran")
+
 library(qtl2)
+install.packages("qtl2convert", repos="https://rqtl.org/qtl2cran")
 
 
 ##### on killdevil
@@ -23,7 +24,7 @@ saveRDS(all2, "all2.rds")
 ##### on desktop
 #setwd("/Users/kathiesun")
 
-genot <- read.table("../PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
+genot <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
                     sep="\t", header=T)
 colnames(genot)[3:4] <- c("Allele1", "Allele2")
 genot[genot=="-"] = NA  
@@ -59,27 +60,26 @@ DOQTL:::calc.genoprob(data2, output.dir = "../do2",
 
 
 ### intensity
-
 genot <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
                     sep="\t", header=T)
-genot2_X <- genot[,c("SNP.Name","Sample.ID","X")]
-genot2_Y <- genot[,c("SNP.Name","Sample.ID","Y")]
-genot2_Xm <- spread(genot2_X, SNP.Name, X, drop=F)
-genot2_Ym <- spread(genot2_Y, SNP.Name, Y, drop=F)
-rownames(genot2_Xm) <- genot2_Xm[,1]
-genot2_Xm <- genot2_Xm[,-1]
-rownames(genot2_Ym) <- genot2_Ym[,1]
-genot2_Ym <- genot2_Ym[,-1]
-genot2_Xm <- genot2_Xm[grep("DO2", rownames(genot2_Xm)),]
-genot2_Ym <- genot2_Ym[grep("DO2", rownames(genot2_Ym)),]
+genot2_x <- genot[,c("SNP.Name","Sample.ID","X")]
+genot2_y <- genot[,c("SNP.Name","Sample.ID","Y")]
+genot2_xm <- spread(genot2_x, SNP.Name, X, drop=F)
+genot2_ym <- spread(genot2_y, SNP.Name, Y, drop=F)
+rownames(genot2_xm) <- genot2_xm[,1]
+rownames(genot2_ym) <- genot2_ym[,1]
+genot2_xm <- genot2_xm[,-1]
+genot2_xm <- genot2_xm[grep("DO2", rownames(genot2_xm)),]
+genot2_ym <- genot2_ym[,-1]
+genot2_ym <- genot2_ym[grep("DO2", rownames(genot2_ym)),]
 
-sex <- unlist(lapply(strsplit(rownames(genot2_Xm),"-|_"), function(x) x[[4]]))
-names(sex) <- rownames(genot2_Xm)
+sex <- unlist(lapply(strsplit(rownames(genot2_xm),"-|_"), function(x) x[[4]]))
+names(sex) <- rownames(genot2_xm)
 gen <- rep("DO10", length(sex))
-names(gen) <- rownames(genot2_Xm)
+names(gen) <- rownames(genot2_xm)
 
-data2int <- list(x=genot2_Xm, y=genot2_Ym, sex=sex, gen=gen)
-saveRDS(data2int, "~/pomp_do_intensities/alleles/data2_int.rds")
+data2int <- list(x=genot2_xm, y=genot2_ym, sex=sex, gen=gen)
+saveRDS(data2int, "data2_int.rds")
 data2int <- readRDS("data2_int.rds")
 
 
@@ -89,9 +89,8 @@ remove <- union(which(apply(data2int$x, 2, function(x) sum(is.na(x))) > 0),
 data2int$x <- data2int$x[,-remove]
 data2int$x <- data2int$y[,-remove]
 
-DOQTL:::calc.genoprob(data2int, output.dir = "../do2_int", 
+DOQTL:::calc.genoprob(data2_int, output.dir = "../do2_int", 
                       plot = FALSE, sampletype="DO", method="intensity")
-
 ####
 genot_UNL <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
                         sep="\t", header=T)
@@ -117,24 +116,28 @@ data1 <- list(geno=genot_UNL_mat, sex=sex_UNL, gen=gen)
 calc.genoprob.alleles(data1, output.dir = "../do1")
 
 ### intensity
-genot1_X <- genot_UNL[,c("SNP.Name","Sample.ID","X")]
-genot1_Y <- genot_UNL[,c("SNP.Name","Sample.ID","Y")]
-genot1_Xm <- spread(genot1_X, SNP.Name, X, drop=F)
-genot1_Ym <- spread(genot1_Y, SNP.Name, Y, drop=F)
-rownames(genot1_Xm) <- genot1_Xm[,1]
-genot1_Xm <- genot1_Xm[,-1]
-rownames(genot1_Ym) <- genot1_Ym[,1]
-genot1_Ym <- genot1_Ym[,-1]
-genot1_Xm <- genot1_Xm[grep("DO1", rownames(genot1_Xm)),]
-genot1_Ym <- genot1_Ym[grep("DO1", rownames(genot1_Ym)),]
 
-sex <- unlist(lapply(strsplit(rownames(genot1_Xm),"-|_"), function(x) x[[4]]))
-names(sex) <- toupper(rownames(genot1_Xm))
+genot_UNL <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
+                        sep="\t", header=T)
+
+genot1_x <- genot[,c("SNP.Name","Sample.ID","X")]
+genot1_y <- genot[,c("SNP.Name","Sample.ID","Y")]
+genot1_xm <- spread(genot1_x, SNP.Name, X, drop=F)
+genot1_ym <- spread(genot1_y, SNP.Name, Y, drop=F)
+rownames(genot1_xm) <- genot1_xm[,1]
+rownames(genot1_ym) <- genot1_ym[,1]
+genot1_xm <- genot1_xm[,-1]
+genot1_xm <- genot1_xm[grep("DO1", rownames(genot1_xm)),]
+genot1_ym <- genot1_ym[,-1]
+genot1_ym <- genot1_ym[grep("DO1", rownames(genot1_ym)),]
+
+sex <- unlist(lapply(strsplit(rownames(genot1_xm),"-|_"), function(x) x[[4]]))
+names(sex) <- rownames(genot1_xm)
 gen <- rep("DO10", length(sex))
-names(gen) <- rownames(genot1_Xm)
+names(gen) <- rownames(genot1_xm)
 
-data1int <- list(x=genot1_Xm, y=genot1_Ym, sex=sex, gen=gen)
-saveRDS(data1int, "~/pomp_do_intensities/alleles/data1_int.rds")
+data1int <- list(x=genot1_xm, y=genot1_ym, sex=sex, gen=gen)
+saveRDS(data1int, "data1_int.rds")
 data1int <- readRDS("data1_int.rds")
 DOQTL:::calc.genoprob(data1int, output.dir = "../do1_int", 
                       plot = FALSE, sampletype="DO", method="intensity")
@@ -179,4 +182,5 @@ ROP.scan <- scan.h2lmm(genomecache=your.cache.dir, data=DO.data,
                        use.fix.par=TRUE, pheno.id=your.id.string)
 
 genome.plotter.whole(scan.list=list(ROP=rop.scan))
+
 # MM_snps.Rdata: Possible map data for DO

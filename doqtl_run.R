@@ -10,3 +10,5 @@ DOQTL:::calc.genoprob(data2, output.dir = "../do2",
 data1 <- readRDS("data1.rds")
 DOQTL:::calc.genoprob(data2, output.dir = "../do1", 
                       plot = FALSE, sampletype="DO", method="allele")
+
+quit()
