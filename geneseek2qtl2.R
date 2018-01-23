@@ -71,7 +71,7 @@ for(ifile in ifiles) {
     cat(" -Reading data\n")
     g <- myfread(ifile)
     
-    ### removed DO1/2 classifier
+    ### removed DO1/2 classifier in mouse id
     ### removed mouse 269 b/c missing data
     g$`Sample ID` <- unlist(lapply(strsplit(g$`Sample ID`, "-"), function(x) x[3]))
     remove <- union(which(is.na(g$`Sample ID`)), which(g$`Sample ID` %in% remove_samps))
