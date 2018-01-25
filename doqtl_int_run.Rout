@@ -22,13 +22,7 @@ Creating a generic function for ‘nchar’ from package ‘base’ in package �
 Loading required package: DBI
 
 
+> setwd("~/pomp_do_intensities")
 > 
-> setwd("~/pomp_do_intensities/alleles")
-> 
-> data2int <- readRDS("data2_int.rds")
-> DOQTL:::calc.genoprob(data2int, output.dir = "../do2_int", 
-+                       plot = FALSE, sampletype="DO", method="intensity")
-Error in array(x, c(length(x), 1L), if (!is.null(names(x))) list(names(x),  : 
-  'data' must be of a vector type, was 'NULL'
-Calls: <Anonymous> ... as.matrix -> as.matrix -> as.matrix.default -> array
-Execution halted
+> genot2 <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
++                      sep="\t", header=T)
