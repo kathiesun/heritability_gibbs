@@ -8,8 +8,10 @@ install.packages("qtl2convert", repos="https://rqtl.org/qtl2cran")
 
 
 ##### on killdevil
-setwd("~/pomp_do_intensities/alleles")
+setwd("~/pomp_do_intensities")
 #source("../../h2_src/doqtl.R")
+genot2 <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
+                    sep="\t", header=T)
 
 all1 <- c()
 all2 <- c()
@@ -22,10 +24,11 @@ saveRDS(all1, "all1.rds")
 saveRDS(all2, "all2.rds")
 
 ##### on desktop
-#setwd("/Users/kathiesun")
+#setwd("~/pomp_do_intensities")
+genot2 <- read.table("PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", sep="\t", header=T)
+genot1 <- read.table("UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", sep="\t", header=T)
 
-genot <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
-                    sep="\t", header=T)
+
 colnames(genot)[3:4] <- c("Allele1", "Allele2")
 genot[genot=="-"] = NA  
 
@@ -62,10 +65,20 @@ DOQTL:::calc.genoprob(data2, output.dir = "../do2",
 ### intensity
 genot <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
                     sep="\t", header=T)
-genot2_x <- genot[,c("SNP.Name","Sample.ID","X")]
-genot2_y <- genot[,c("SNP.Name","Sample.ID","Y")]
-genot2_xm <- spread(genot2_x, SNP.Name, X, drop=F)
-genot2_ym <- spread(genot2_y, SNP.Name, Y, drop=F)
+remove <- union(which(is.na(genot2$Y)), which(is.na(genot2$X)))
+genot2_rem <- genot2[-remove,]
+genot2_x <- genot2_rem[,c("SNP.Name","Sample.ID","X")]
+genot2_y <- genot2_rem[,c("SNP.Name","Sample.ID","Y")]
+
+
+genot2_xm <- spread(genot2_x, SNP.Name, X, drop=T)
+genot2_ym <- spread(genot2_y, SNP.Name, Y, drop=T)
+remove <- union(which(apply(genot2_ym, 2, function(x) sum(is.na(x)) > 0)), 
+                which(apply(genot2_xm, 2, function(x) sum(is.na(x)) > 0)))
+
+genot2_xm <- genot2_xm[,-remove]
+genot2_ym <- genot2_ym[,-remove]
+
 rownames(genot2_xm) <- genot2_xm[,1]
 rownames(genot2_ym) <- genot2_ym[,1]
 genot2_xm <- genot2_xm[,-1]
@@ -78,18 +91,13 @@ names(sex) <- rownames(genot2_xm)
 gen <- rep("DO10", length(sex))
 names(gen) <- rownames(genot2_xm)
 
+
+
 data2int <- list(x=genot2_xm, y=genot2_ym, sex=sex, gen=gen)
 saveRDS(data2int, "data2_int.rds")
 data2int <- readRDS("data2_int.rds")
 
-
-remove <- union(which(apply(data2int$x, 2, function(x) sum(is.na(x))) > 0), 
-                which(apply(data2int$y, 2, function(x) sum(is.na(x))) > 0))
-
-data2int$x <- data2int$x[,-remove]
-data2int$x <- data2int$y[,-remove]
-
-DOQTL:::calc.genoprob(data2_int, output.dir = "../do2_int", 
+DOQTL:::calc.genoprob(data2int, output.dir = "../do2_int", array = "megamuga",
                       plot = FALSE, sampletype="DO", method="intensity")
 ####
 genot_UNL <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
@@ -117,11 +125,11 @@ calc.genoprob.alleles(data1, output.dir = "../do1")
 
 ### intensity
 
-genot_UNL <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
+genot1 <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
                         sep="\t", header=T)
 
-genot1_x <- genot[,c("SNP.Name","Sample.ID","X")]
-genot1_y <- genot[,c("SNP.Name","Sample.ID","Y")]
+genot1_x <- genot1[,c("SNP.Name","Sample.ID","X")]
+genot1_y <- genot1[,c("SNP.Name","Sample.ID","Y")]
 genot1_xm <- spread(genot1_x, SNP.Name, X, drop=F)
 genot1_ym <- spread(genot1_y, SNP.Name, Y, drop=F)
 rownames(genot1_xm) <- genot1_xm[,1]
