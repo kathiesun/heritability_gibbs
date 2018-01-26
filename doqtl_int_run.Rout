@@ -22,7 +22,57 @@ Creating a generic function for ‘nchar’ from package ‘base’ in package �
 Loading required package: DBI
 
 
+> library(tidyr)
+> library(magrittr)
+
+Attaching package: ‘magrittr’
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+> 
 > setwd("~/pomp_do_intensities")
 > 
 > genot2 <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
 +                      sep="\t", header=T)
+> genot1 <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL Mega Muga 31aug2012_FinalReport_dataOnly.txt", 
++                      sep="\t", header=T)
+> 
+> ## do2
+> remove <- union(which(is.na(genot2$Y)), which(is.na(genot2$X)))
+> genot2_rem <- genot2[-remove,]
+> genot2_x <- genot2_rem[,c("SNP.Name","Sample.ID","X")]
+> genot2_y <- genot2_rem[,c("SNP.Name","Sample.ID","Y")]
+> 
+> genot2_xm <- spread(genot2_x, SNP.Name, X, drop=T)
+> genot2_ym <- spread(genot2_y, SNP.Name, Y, drop=T)
+> remove <- union(which(apply(genot2_ym, 2, function(x) sum(is.na(x)) > 0)), 
++                 which(apply(genot2_xm, 2, function(x) sum(is.na(x)) > 0)))
+> 
+> genot2_xm <- genot2_xm[,-remove]
+> genot2_ym <- genot2_ym[,-remove]
+> 
+> rownames(genot2_xm) <- genot2_xm[,1]
+> rownames(genot2_ym) <- genot2_ym[,1]
+> genot2_xm <- genot2_xm[,-1]
+> genot2_xm <- genot2_xm[grep("DO2", rownames(genot2_xm)),]
+> genot2_ym <- genot2_ym[,-1]
+> genot2_ym <- genot2_ym[grep("DO2", rownames(genot2_ym)),]
+> 
+> sex <- unlist(lapply(strsplit(rownames(genot2_xm),"-|_"), function(x) x[[4]]))
+> names(sex) <- rownames(genot2_xm)
+> gen <- rep("DO10", length(sex))
+> names(gen) <- rownames(genot2_xm)
+> 
+> data2int <- list(x=genot2_xm, y=genot2_ym, sex=sex, gen=gen)
+> #saveRDS(data2int, "data2_int.rds")
+> #data2int <- readRDS("data2_int.rds")
+> 
+> DOQTL:::calc.genoprob(data2int, output.dir = "alleles/do2_int", array = "megamuga",
++                       plot = FALSE, sampletype="DO", method="intensity")
+[1] "CHR 1"
+Error in hcVVV(data = c(-0.472968494191216, -0.472968494191216, -0.472968494191216,  : 
+  missing values not allowed in data
+Calls: <Anonymous> ... eval -> eval -> mclustBIC -> hc -> eval -> eval -> hcVVV
+Execution halted

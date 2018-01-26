@@ -1,4 +1,7 @@
 library(DOQTL)
+library(tidyr)
+library(magrittr)
+
 setwd("~/pomp_do_intensities")
 
 genot2 <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
