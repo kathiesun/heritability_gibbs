@@ -1,6 +1,7 @@
 library(DOQTL)
 library(tidyr)
 library(magrittr)
+=======
 
 setwd("~/pomp_do_intensities")
 
