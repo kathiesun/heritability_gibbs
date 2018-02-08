@@ -1,11 +1,7 @@
 library(happy.hbrem)
 library(DOQTL)
-library(tidyr)
-library(magrittr)
-
+library(tidyverse)
 library(qtl2)
-install.packages("qtl2convert", repos="https://rqtl.org/qtl2cran")
-
 
 ##### on killdevil
 setwd("~/pomp_do_intensities")
