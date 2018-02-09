@@ -172,7 +172,7 @@ write_control_file("DO12_rqtl2.json",
                    founder_geno_transposed=TRUE,
                    gmap_file=paste0("GM/GM/GM_gmap", chr, ".csv"),
                    pmap_file=paste0("GM/GM/GM_pmap", chr, ".csv"),
-                   geno_file=paste0("rqtl2_do12_geno", chr, ".csv"),
+                   geno_file=paste0("rqtl_data/rqtl2_do12_geno", chr, ".csv"),
                    geno_transposed=TRUE,
                    geno_codes=list(A=1, H=2, B=3),
                    xchr="X",
@@ -188,3 +188,5 @@ write_control_file("DO12_rqtl2.json",
 data <- read_cross2("DO12_rqtl2.json", quiet=F)
 pr <- calc_genoprob(data, error_prob=0.002)
 apr <- genoprob_to_alleleprob(pr)
+
+
