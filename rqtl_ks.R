@@ -49,7 +49,7 @@ scan12 <- function(genoprobs, pheno, kinship=NULL, addcovar=NULL, Xcovar=NULL,
     }
     else {
       # square-root of weights (only if model="normal")
-      weights <- qtl2::sqrt_weights(weights) # also check >0 (and if all 1's, turn to NULL)
+      weights <- sqrt_weights(weights) # also check >0 (and if all 1's, turn to NULL)
     }
     
     # find individuals in common across all arguments
