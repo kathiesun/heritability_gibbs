@@ -186,7 +186,7 @@ write_control_file("DO12_rqtl2.json",
 ##########
 #source("read_cross2.R")
 data <- read_cross2("DO12_rqtl2.json", quiet=F)
-pr <- calc_genoprob(data, error_prob=0.002)
+pr <- calc_genoprob(data, map, error_prob=0.002)
 apr <- genoprob_to_alleleprob(pr)
 
-
+iron <- read_cross2( system.file("extdata", "iron.zip", package="qtl2") )

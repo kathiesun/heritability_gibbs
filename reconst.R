@@ -5,6 +5,8 @@ library(qtl2)
 
 ##### on killdevil
 setwd("~/pomp_do_intensities")
+#setwd("/nas/depts/006/valdar-lab/users/sunk/rqtl_do/")
+
 #source("../../h2_src/doqtl.R")
 genot2 <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC-Pomp Mouse 12dec2012_FinalReport_dataOnly.txt", 
                     sep="\t", header=T)
