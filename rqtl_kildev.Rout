@@ -1,0 +1,80 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(qtl2)
+> library(tidyverse)
+Loading tidyverse: ggplot2
+Loading tidyverse: tibble
+Loading tidyverse: tidyr
+Loading tidyverse: readr
+Loading tidyverse: purrr
+Loading tidyverse: dplyr
+Conflicts with tidy packages ---------------------------------------------------
+filter():   dplyr, stats
+lag():      dplyr, stats
+read_csv(): readr, qtl2
+> 
+> #### read in data ####
+> setwd("~/pomp_do_intensities")
+> pr <- readRDS("rqtl2_do12_probs.rds")
+> #pr1 <- readRDS("rqtl2_do1_probs.rds")
+> #pr2 <- readRDS("rqtl2_do2_probs.rds")
+> pheno <- read.csv("DO_Pheno9.csv")
+> colnames(pheno)[1] <- "MouseID"
+> covar <- readRDS("DO_covar.rds")
+> 
+> ## create pseudomarker mapping object
+> gmap <- read.csv("GM/GM/GM_info.csv", stringsAsFactors = T)
+> gmap$marker <- as.character(gmap$marker)
+> gmap %>% select(marker, chr, cM) %>%
++   filter(chr != "Y" & chr != "M") -> gmap
+> gmap_list <- list()
+> for(i in 1:length(unique(gmap$chr))){
++   chr <- unique(gmap$chr)[i]
++   gmap_list[[i]] <- gmap[which(gmap$chr == chr), 3]
++   names(gmap_list[[i]]) <- gmap[which(gmap$chr == chr), "marker"]
++ }
+> names(gmap_list) <- unique(gmap$chr)
+> map <- insert_pseudomarkers(gmap_list, step=1)
+> 
+> ######### scans ######### 
+> rownames(covar) <- covar$MouseID
+> rownames(pheno) <- pheno$MouseID
+> covar$Sex <- ifelse(covar$Sex == "Female", 1, 0)
+> drop <- c("DO", "Wheel", "Wheel","Sex", "Diet")
+> 
+> covar %>% 
++   filter(DO == 2) %>% 
++   rename(id = MouseID) %>%
++   select(Sex) %>%
++   as.matrix() -> covar2
+> 
+> pheno %>% 
++   filter(DO == 2) %>%
++   select(which(colMeans(is.na(.)) < 0.25)) %>%
++   select(-one_of(drop)) %>%
++   mutate(CtClr = as.numeric(CtClr)) %>%
++   rename(id = MouseID) -> pheno2
+> 
+> rownames(covar2) <- pheno2$id
+> rownames(pheno2) <- pheno2$id
+> pheno2 <- as.matrix(pheno2[,-1])
+> 
+> out2 <- scan1(pr, pheno = pheno2, addcovar = covar2)
+> outperm <- scan1perm(pr, pheno=pheno2, addcovar=covar2, n_perm=1000)
