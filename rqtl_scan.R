@@ -15,7 +15,7 @@ data <- read_cross2("DO12_rqtl2.json", quiet=F)
 pr <- calc_genoprob(data, error_prob=0.002)
 
 ## create pseudomarker mapping object
-gmap <- read.csv("GM/GM/GM_info.csv", stringsAsFactors = T)
+gmap <- read.csv("E:/Dropbox (ValdarLab)/GM/GM_info.csv", stringsAsFactors = T)
 gmap$marker <- as.character(gmap$marker)
 gmap %>% select(marker, chr, cM) %>%
   filter(chr != "Y" & chr != "M") -> gmap

@@ -48,7 +48,7 @@ rownames(pheno2) <- pheno2$id
 pheno2 <- as.matrix(pheno2[,-1])
 
 out2 <- scan1(pr, pheno = pheno2, addcovar = covar2)
-outperm <- scan1perm(pr, pheno=pheno2, addcovar=covar2, n_perm=1000)
+#outperm <- scan1perm(pr, pheno=pheno2, addcovar=covar2, n_perm=1000)
 
 saveRDS(out2, "do2_scan1.rds")
-saveRDS(outperm, "do2_scan1perm.rds")
+#saveRDS(outperm, "do2_scan1perm.rds")

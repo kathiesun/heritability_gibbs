@@ -102,7 +102,7 @@ genot_UNL <- read.table("/nas/depts/006/valdar-lab/users/sunk/UNL_083112/UNC-UNL
                         sep="\t", header=T)
 colnames(genot_UNL)[3:4] <- c("Allele1", "Allele2")
 
-tmpvec <- readRDS("alleles1.rds")
+tmpvec <- readRDS("./alleles/data1.rds")
 genot_UNL$allele <- tmpvec
 genot_UNL$Sample.ID <- as.character(paste(genot_UNL$Sample.ID))
 genot_tmp <- genot_UNL[,c("SNP.Name","Sample.ID","allele")]
@@ -119,7 +119,11 @@ gen <- rep("DO10", length(sex_UNL))
 names(gen) <- rownames(genot_UNL_mat)
 
 data1 <- list(geno=genot_UNL_mat, sex=sex_UNL, gen=gen)
-calc.genoprob.alleles(data1, output.dir = "../do1")
+    #data1 saved as data1.rds in alleles
+
+DOQTL:::calc.genoprob(data1, output.dir = "do1", 
+                      plot = FALSE, sampletype="DO", method="allele")
+#calc.genoprob.alleles(data1, output.dir = "../do1")
 
 ### intensity
 
@@ -147,6 +151,14 @@ saveRDS(data1int, "data1_int.rds")
 data1int <- readRDS("data1_int.rds")
 DOQTL:::calc.genoprob(data1int, output.dir = "../do1_int", 
                       plot = FALSE, sampletype="DO", method="intensity")
+
+## DOQTL scan with alleles 
+
+
+## DOQTL scan with intensities from Dan Gatti
+qtl = scanone(pheno = pheno, pheno.col = "prop.bm.MN.RET", probs = probs, K = K, 
+              addcovar = addcovar, snps = muga_snps)
+
 
 
 ####################### OLDER CODE ##########################
