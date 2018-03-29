@@ -12,10 +12,10 @@ genot2 <- read.table("/nas/depts/006/valdar-lab/users/sunk/PompMM08_12222012/UNC
                     sep="\t", header=T)
 
 all1 <- c()
-all2 <- c()
+#all2 <- c()
 for(sim in 1:100){
-  all1 <- c(all1, readRDS("DO1_alleles_",sim,".rds"))
-  all2 <- c(all2, readRDS("DO2_alleles_",sim,".rds"))
+  all1 <- c(all1, readRDS(paste0("DO1_alleles_",sim,".rds")))
+#  all2 <- c(all2, readRDS("DO2_alleles_",sim,".rds"))
 }
 
 saveRDS(all1, "all1.rds")
@@ -48,14 +48,14 @@ rownames(genot_mat) <- genot_mat[,1]
 genot_mat <- genot_mat[,-1]
 genot1_intm <- genot1_intm[grep("DO2", rownames(genot1_intm)),]
 
-genot_mat <- genot_mat[grep("DO2", rownames(genot_mat)),]
-sex <- unlist(lapply(strsplit(rownames(genot_mat),"-|_"), function(x) x[[4]]))
+genot_mat <- genot_mat[grep("DO1", rownames(genot_mat)),]
+sex <- toupper(unlist(lapply(strsplit(rownames(genot_mat),"-|_"), function(x) x[[4]])))
 names(sex) <- rownames(genot_mat)
 gen <- rep("DO10", length(sex))
 names(gen) <- rownames(genot_mat)
 
-data2 <- list(geno=genot_mat, sex=sex, gen=gen)
-data2 <- readRDS("data2.rds")
+data1 <- list(geno=genot_mat, sex=sex, gen=gen)
+data1 <- saveRDS(data1, "data1_redo.rds")
 DOQTL:::calc.genoprob(data2, output.dir = "../do2", 
                       plot = FALSE, sampletype="DO", method="allele")
 
