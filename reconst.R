@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #library(happy.hbrem)
 library(DOQTL)
 library(tidyverse)
@@ -179,5 +180,3 @@ calc.genoprob(data, chr = "all", output.dir = ".", plot = TRUE,
               array = c("gigamuga", "megamuga", "muga", "other"), 
               sampletype = c("DO", "CC", "DOF1", "other"), method = c("intensity", "allele"), 
               founders, transprobs, snps)
-
-
