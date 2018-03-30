@@ -1,18 +1,43 @@
+library(DOQTL)
+
+
 setwd("/nas02/home/k/y/kys6/pomp_do_intensities")
 gm_data <- read.csv("GM/GM/GM_info.csv")
-load("do2/founder.probs.Rdata")
+
+
+## if founder.probs.Rdata not available
+condense.model.probs(path = "DO1_redo", write = "founder.probs.Rdata",
+model = "additive",cross = "DO")
+
+
+load("DO1_redo/founder.probs.Rdata")
+
+#####
+## for DO1 remove DP.DO1.137.f_8697404046_R11C01 and make
+## DP.DO1.137.f_8659977009_R08C01 only mouse 137
+remove <- grep("137", rownames(model.probs))[2]
+rename <- grep("137", rownames(model.probs))[1]
+rownames(model.probs)[rename] <- "DP.DO1.137.f"
+model.probs <- model.probs[-remove, , ]
+
 pheno <- read.csv("DO_Pheno9.csv")
 covar <- readRDS("DO_covar.rds")
-pheno2 <- pheno[which(pheno$DO == 2),]
-pheno2 <- pheno2[,-which(apply(pheno2, 2, function(x) sum(is.na(x))) > nrow(pheno2)/3)]
-covar2 <- covar[which(covar$DO == 2),]
+pheno_use <- pheno[which(pheno$DO == 1),]
+pheno_use <- pheno_use[,-which(apply(pheno_use, 1, function(x) sum(is.na(x))) > nrow(pheno_use)/3)]
+covar_use <- covar[which(covar$DO == 1),]
 
-rownames(pheno2) <- paste0("DP.DO", pheno2$DO, ".",pheno2$MouseID, ".",ifelse(pheno2$Sex == 0, "F", "M"))
-rownames(covar2) <- paste0("DP.DO", covar2$DO, ".", covar2$MouseID,".",ifelse(covar2$Sex == "Female", "F", "M"))
+DO = 1
+fem <- ifelse(DO == 1, "f", "F")
+mal <- ifelse(DO == 1, "m", "M")
 
+rownames(pheno_use) <- paste0("DP.DO", pheno_use$DO, ".",pheno_use$MouseID, ".",ifelse(pheno_use$Sex == 0, fem, mal))
+rownames(covar_use) <- paste0("DP.DO", covar_use$DO, ".", covar_use$MouseID,".",ifelse(covar_use$Sex == "Female", fem, mal))
+pheno_use <- pheno_use[-which(is.na(pheno_use$Sex)),]
 
 K = DOQTL::kinship.probs(model.probs, snps = gm_data, bychr = TRUE)
 
 #rownames(model.probs) <- do.call("rbind", strsplit(rownames(model.probs),"[.]"))[,3]
-qtl = DOQTL::scanone(pheno = pheno2, pheno.col = "CtClr", probs = model.probs, K = K, 
-                     addcovar = covar2, snps = gm_data)
+
+phen_col <- c(6:90)
+qtl = DOQTL::scanone(pheno = pheno_use, pheno.col = phen_col, probs = model.probs, K = K,
+                     addcovar = covar_use, snps = gm_data)
