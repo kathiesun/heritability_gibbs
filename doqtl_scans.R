@@ -2,7 +2,8 @@ library(DOQTL)
 
 
 setwd("/nas02/home/k/y/kys6/pomp_do_intensities")
-gm_data <- read.csv("GM/GM/GM_info.csv")
+setwd("/Users/kathiesun/Dropbox (ValdarLab)/outputs/h2_input/")
+gm_data <- read.csv("GM_info.csv")
 
 
 ## if founder.probs.Rdata not available
@@ -10,7 +11,7 @@ condense.model.probs(path = "DO1_redo", write = "founder.probs.Rdata",
 model = "additive",cross = "DO")
 
 
-load("DO1_redo/founder.probs.Rdata")
+load("founder.probs.1.Rdata")
 
 #####
 ## for DO1 remove DP.DO1.137.f_8697404046_R11C01 and make
@@ -23,7 +24,7 @@ model.probs <- model.probs[-remove, , ]
 pheno <- read.csv("DO_Pheno9.csv")
 covar <- readRDS("DO_covar.rds")
 pheno_use <- pheno[which(pheno$DO == 1),]
-pheno_use <- pheno_use[,-which(apply(pheno_use, 1, function(x) sum(is.na(x))) > nrow(pheno_use)/3)]
+pheno_use <- pheno_use[,-which(apply(pheno_use, 2, function(x) sum(is.na(x))) > nrow(pheno_use)/3)]
 covar_use <- covar[which(covar$DO == 1),]
 
 DO = 1
@@ -32,6 +33,8 @@ mal <- ifelse(DO == 1, "m", "M")
 
 rownames(pheno_use) <- paste0("DP.DO", pheno_use$DO, ".",pheno_use$MouseID, ".",ifelse(pheno_use$Sex == 0, fem, mal))
 rownames(covar_use) <- paste0("DP.DO", covar_use$DO, ".", covar_use$MouseID,".",ifelse(covar_use$Sex == "Female", fem, mal))
+covar_use$Sex <- ifelse(covar_use$Sex == "Female", 0, 1)
+covar_use <- data.matrix(covar_use)
 pheno_use <- pheno_use[-which(is.na(pheno_use$Sex)),]
 
 K = DOQTL::kinship.probs(model.probs, snps = gm_data, bychr = TRUE)
@@ -41,3 +44,10 @@ K = DOQTL::kinship.probs(model.probs, snps = gm_data, bychr = TRUE)
 phen_col <- c(6:90)
 qtl = DOQTL::scanone(pheno = pheno_use, pheno.col = phen_col, probs = model.probs, K = K,
                      addcovar = covar_use, snps = gm_data)
+
+save(qtl, "doqtl_scans_do1.rds")
+
+quit()
+
+
+

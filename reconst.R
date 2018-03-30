@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #library(happy.hbrem)
 library(DOQTL)
 library(tidyverse)
@@ -65,6 +64,7 @@ names(gen) <- rownames(genot_mat)
 data2 <- list(geno=genot_mat, sex=sex, gen=gen)
 
 ## actually ran on longleaf with sh
+## note: didn't work on longleaf; only r/3.3.1!!!
 ## sbatch -t 10:00 -n 1 --wrap="R CMD BATCH --no-save runFounderProb.R"
 
 data1 <- readRDS("h2_input/data1.rds")
