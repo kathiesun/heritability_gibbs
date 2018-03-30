@@ -1,6 +1,14 @@
 library(qtl2)
 library(tidyverse)
 
+######
+# this code uses RQTL on previously generated founder probabilities to perform ROP
+# using alleles (from DOQTL), just like DOQTL
+# code for plotting and other downstream stuff in rqtl_plot.R
+#
+
+
+
 #### read in data ####
 setwd("~/pomp_do_intensities")
 pr <- readRDS("rqtl2_do12_probs.rds")
