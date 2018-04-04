@@ -12,6 +12,7 @@ model = "additive",cross = "DO")
 
 
 load("founder.probs.1.Rdata")
+load("founder.probs.2.Rdata")
 
 #####
 ## for DO1 remove DP.DO1.137.f_8697404046_R11C01 and make
@@ -23,11 +24,11 @@ model.probs <- model.probs[-remove, , ]
 
 pheno <- read.csv("DO_Pheno9.csv")
 covar <- readRDS("DO_covar.rds")
-pheno_use <- pheno[which(pheno$DO == 1),]
+pheno_use <- pheno[which(pheno$DO == 2),]
 pheno_use <- pheno_use[,-which(apply(pheno_use, 2, function(x) sum(is.na(x))) > nrow(pheno_use)/3)]
-covar_use <- covar[which(covar$DO == 1),]
+covar_use <- covar[which(covar$DO == 2),]
 
-DO = 1
+DO = 2
 fem <- ifelse(DO == 1, "f", "F")
 mal <- ifelse(DO == 1, "m", "M")
 
@@ -35,17 +36,18 @@ rownames(pheno_use) <- paste0("DP.DO", pheno_use$DO, ".",pheno_use$MouseID, ".",
 rownames(covar_use) <- paste0("DP.DO", covar_use$DO, ".", covar_use$MouseID,".",ifelse(covar_use$Sex == "Female", fem, mal))
 covar_use$Sex <- ifelse(covar_use$Sex == "Female", 0, 1)
 covar_use <- data.matrix(covar_use)
-pheno_use <- pheno_use[-which(is.na(pheno_use$Sex)),]
+if(length(which(is.na(pheno_use$Sex))) > 0) pheno_use <- pheno_use[-which(is.na(pheno_use$Sex)),]
 
 K = DOQTL::kinship.probs(model.probs, snps = gm_data, bychr = TRUE)
 
 #rownames(model.probs) <- do.call("rbind", strsplit(rownames(model.probs),"[.]"))[,3]
 
 phen_col <- c(6:90)
+phen_col <- c(6:98)
 qtl = DOQTL::scanone(pheno = pheno_use, pheno.col = phen_col, probs = model.probs, K = K,
                      addcovar = covar_use, snps = gm_data)
 
-save(qtl, "doqtl_scans_do1.rds")
+saveRDS(qtl, "../h2_outputs/doqtl_scans_do2_again.rds")
 
 quit()
 

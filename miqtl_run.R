@@ -1,14 +1,29 @@
+library(miqtl)
+setwd("/nas/depts/006/valdar-lab/users/sunk")
+MM_snps <- read.table("DO_mapping/MM_snps.txt")
+DO.output.dir <- c("/nas/depts/006/valdar-lab/users/sunk/pomp_do_intensities/DO1_redo",
+                   "/nas/depts/006/valdar-lab/users/sunk/pomp_do_intensities/DO2_redo",
+                   "/nas02/home/k/y/kys6/DO_mapping/DO_probs_from_gatti")
+HAPPY.output.dir <- c("/nas/depts/006/valdar-lab/users/sunk/DO_mapping/miqtl_caches/DO1_cache",
+                      "/nas/depts/006/valdar-lab/users/sunk/DO_mapping/miqtl_caches/DO2_cache",
+                      "/nas/depts/006/valdar-lab/users/sunk/DO_mapping/miqtl_caches/DO_from_gatti_cache")
+
+for(i in 2:3){
+  all.files <- list.files(DO.output.dir[i])
+  subject.files <- all.files[grepl(all.files, pattern="genotype.probs.Rdata", fixed=TRUE)]
+  subjects <- gsub(subject.files, pattern=".genotype.probs.Rdata", replacement="", fixed=TRUE)
+  
+  convert.DOQTL.to.HAPPY(DOQTL.recon.output.path=DO.output.dir[i],
+                         map=MM_snps, HAPPY.output.path=HAPPY.output.dir[i])
+}
+
+convert.DOQTL.to.HAPPY(DOQTL.recon.output.path="/nas/depts/006/valdar-lab/users/sunk/pomp_do_intensities/DO1_redo",
+                       map=MM_snps, 
+                       HAPPY.output.path="/nas/depts/006/valdar-lab/users/sunk/DO_mapping/miqtl_caches/DO1_cache")
 
 
 
-DO.output.dir <- "/nas02/home/k/y/kys6/DO_mapping/DO_probs_from_gatti"
-all.files <- list.files(DO.output.dir)
-subject.files <- all.files[grepl(all.files, pattern="genotype.probs.Rdata", fixed=TRUE)]
 
-
-
-
-/nas/depts/006/valdar-lab/users/sunk/DO_mapping/miqtl_caches/redo_DO_cache
 
 
 ####################### OLDER CODE ##########################
@@ -21,6 +36,7 @@ calc.genoprob(data, chr = "all", output.dir = ".", plot = TRUE,
 DO.output.dir <- "/nas02/home/k/y/kys6/DO_mapping/DO_genotypes"
 all.files <- list.files(DO.output.dir)
 subject.files <- all.files[grepl(all.files, pattern="genotype.probs.Rdata", fixed=TRUE)]
+
 
 # from Greg
 
